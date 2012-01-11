@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+	<head>
+	<title></title>
+	</head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+<script> 
+ 
+$(document).ready(function() {
+    $('#sunlookup').click(function() {
+        console.log($('#zip').val());
+        prepareSunshine($('#zip').val());
+    });
+ 
+    function prepareSunshine(zip) {
+        var people = [];
+        var data = {
+            zip: zip
+        };
+        $.getJSON('sunlight.php', {
+            success: 'prepHTML',
+            zip: zip
+        },
+		// callback
+        function(data) {
+            $.each(data.response.legislators, function(i, leg) {
+                var legObj = leg.legislator;
+                people.push(legObj);
+            });
+ 
+            var makeHTML = "<div id='reps'>";
+            for (var i = 0; i < people.length; i++) {
+                makeHTML += "<div class='rep'>";
+                var legObj = people[i];
+                console.log(legObj);
+ 
+                var www = legObj.website;
+                var wwwform = legObj.webform;
+                var name = legObj.title + " " + legObj.firstname + " " + legObj.lastname;
+                var addr = legObj.congress_office;
+                var ph = legObj.phone;
+                var email = legObj.email;
+                var pic = legObj.bioguide_id;
+                var info = legObj.congresspedia_url;
+                var yt = legObj.youtube_url;
+ 
+                var con = "<a href='" + wwwform + "'>Contact</a>";
+                var link = "<a href='" + www + "'>Website</a>";
+                var fname = "<h1>" + name + "</h1>";
+                var addr = "<h3>" + addr + "</h3>";
+                var img = "<img src='images/100x125/" + pic + ".jpg'/>";
+                var phone = "<h3>" + ph + "</h3>";
+ 
+                email != "" ? mail = "<a href='mailto:" + email + "?body=" + _TABLE + "'>Email</a>" : mail = "";
+                info != "" ? wiki = "<a href='" + info + "'>Info</a><br>" : info = "";
+                yt != "" ? yturl = "<a href='" + yt + "'>YouTube</a>" : yturl = "";
+ 
+                makeHTML += img + fname + addr + phone + con + wiki + link + mail + yturl + "<br></div>";
+            }
+            if (legObj == null) {
+				alert ('bad zip code');
+                // handle bad zip
+ 
+            } else {
+ 
+                $('#write').append(makeHTML + '</div>');
+ 
+            }
+        });
+    }
+});
+ 
+</script>
+		
+		
+<style>
+/* Senator Style */
+#reps {clear:both;padding-top: 1px;}
+.rep img { float:left; clear:left; padding-right:10px;}
+.rep {background-color:rgba(0,0,0,0.1);height: 125px;margin:10px;clear:both;}
+.rep h1 {font-size:1em;}
+.rep h3 {margin-left:10px;font-size:.9em;font-weight:normal;}
+.rep a { padding: 0px 5px; font-size:.8em;}
+</style>
+
+<body>
+		<div id="rep_lookup">
+				<p>Enter Zip Code</p>
+				<input id="zip" type='textfield' />
+				<input type='button' value="lookup" id="sunlookup" /></p>
+				<p style="clear:both"></p>
+		</div>
+		<div id="write">
+		</div>
+</body>
+</html>
